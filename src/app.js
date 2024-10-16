@@ -1,10 +1,8 @@
-// Import necessary libraries and models
+// app.js
 const inquirer = require('inquirer');
-const sequelize = require('../config/connection');
-const Department = require('../models/department');
-const Role = require('../models/role');
-const Employee = require('../models/employee');
+const db = require('./db');
 
+// Main menu function
 const mainMenu = () => {
   inquirer
     .prompt({
@@ -27,41 +25,62 @@ const mainMenu = () => {
         case 'View All Departments':
           viewDepartments();
           break;
+        case 'View All Roles':
+          viewRoles();
+          break;
+        case 'View All Employees':
+          viewEmployees();
+          break;
         case 'Add a Department':
           addDepartment();
+          break;
+        case 'Add a Role':
+          addRole();
+          break;
+        case 'Add an Employee':
+          addEmployee();
+          break;
+        case 'Update Employee Role':
+          updateEmployeeRole();
           break;
         case 'Exit':
           sequelize.close();
           break;
-        // Add cases for other operations
       }
     });
 };
 
-// Function to view all departments
-const viewDepartments = async () => {
-  const departments = await Department.findAll();
-  console.table(departments.map(dep => dep.get({ plain: true })));
-  mainMenu();
-};
+// View and add functions
+const viewDepartments = async () => { 
+  db.query ('select * from departments', ( err, rows)=>{
+    if (err){
+      return console.log(err)
+    }
+    console.log(rows.rows)
+    console.table(rows.rows)
+    mainMenu()
+  })
+ };
+const viewRoles = async () => {   db.query ('select * from roles', ( err, rows)=>{
+  if (err){
+    return console.log(err)
+  }
+  console.log(rows.rows)
+  console.table(rows.rows)
+  mainMenu()
+})};
+const viewEmployees = async () => {   db.query ('select * from employees', ( err, rows)=>{
+  if (err){
+    return console.log(err)
+  }
+  console.log(rows.rows)
+  console.table(rows.rows)
+  mainMenu()
+})};
+const addDepartment = () => { /*...*/ };
+const addRole = async () => { /*...*/ };
+const addEmployee = async () => { /*...*/ };
+const updateEmployeeRole = async () => { /*...*/ };
 
-// Function to add a new department
-const addDepartment = () => {
-  inquirer
-    .prompt({
-      type: 'input',
-      name: 'name',
-      message: 'Enter department name:',
-    })
-    .then(async (answer) => {
-      await Department.create({ name: answer.name });
-      console.log('Department added successfully!');
-      mainMenu();
-    });
-};
-sequelize.sync({ force: false }).then(() => {
-  console.log('Database synced');
-  mainMenu();
-});
 
-mainMenu();
+mainMenu()
